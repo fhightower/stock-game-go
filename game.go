@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"strconv"
+	"time"
 )
-
-const startingMoney int = 111
-const maxDays int = 1
 
 type Portfolio = map[string]int
 type StockRange struct {
@@ -16,12 +15,17 @@ type StockRange struct {
 }
 type StockData = map[string]StockRange
 
+const startingMoney int = 111
+const maxDays int = 1
+
 var stockData = StockData{
 	"palantir": StockRange{1, 2},
 	"tesla":    StockRange{2, 3},
 }
+var dailyChoices = []string{"buy", "sell", "view details", "call it a day"}
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
 	fmt.Println("Welcome to the stocks game!")
 	fmt.Printf("The goal is to make as much money in %d days.\n", maxDays)
 	fmt.Printf("You start with $%d\n", startingMoney)
@@ -53,27 +57,30 @@ func getInput(question string) string {
 	return input
 }
 
-func printOptions() int {
+func printOptions(options []string) int {
 	fmt.Println("Options:")
-	fmt.Println("1. Buy")
-	fmt.Println("2. Sell")
-	fmt.Println("3. Show details")
-	fmt.Println("4. Call it a day")
+	for i, option := range options {
+		fmt.Printf("%d: %s\n", i, option)
+	}
 	choice, _ := strconv.Atoi(getInput("Choice: "))
 	return choice
 }
 
+
 func genPrices() Portfolio {
-	// todo: update this
 	prices := make(Portfolio)
+	for stockName, stockRange := range stockData {
+		prices[stockName] = rand.Intn(stockRange.max-stockRange.min) + stockRange.min
+	}
 	return prices
 }
 
 func buy(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
-	// todo: show max number of a stock which can be bought
-	// options
-	// fmt.Printf("You can buy: %a", options)
+	// todo: display the stock names as numbers rather than having to type in the full name
 	stock := getInput("Which stock?")
+	maxStock := money / prices[stock]
+	// todo: handle if maxStock is zero (or negative)
+	fmt.Printf("You can buy a max of %d shares", maxStock)
 	amount, _ := strconv.Atoi(getInput("How many shares?"))
 
 	cost := prices[stock] * amount
@@ -92,12 +99,13 @@ func playDay(day int, portfolio Portfolio, money int) (Portfolio, int) {
 	fmt.Printf("	Prices: %v\n", prices)
 
 	for looping {
-		choice := printOptions()
+		choice := printOptions(dailyChoices[:])
 		fmt.Println(choice)
 		if choice == 1 {
 			portfolio, money = buy(prices, portfolio, money)
+		} else if choice == 4 {
+			looping = false
 		}
-		looping = false
 	}
 	return portfolio, money
 }
