@@ -85,18 +85,32 @@ func genPrices() Portfolio {
 	return prices
 }
 
+func getStockNames(data StockData) [2]string {
+	var names [2]string
+	var i int
+	// todo: is it possible to yield in go?
+	for stockName, _ := range data {
+		names[i] = stockName
+		i++
+	}
+	return names
+}
+
 func buy(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
 	// todo: display the stock names as numbers rather than having to type in the full name
-	stock := getInput("Which stock?")
-	maxStock := money / prices[stock]
+	stockNames := getStockNames(stockData)
+	stockNumber := selectOption(stockNames[:])
+	stockName := stockNames[stockNumber]
+	stockPrice := prices[stockName]
+	maxStock := money / stockPrice
 	// todo: handle if maxStock is zero (or negative)
 	fmt.Printf("You can buy a max of %d shares", maxStock)
 	amount, _ := strconv.Atoi(getInput("How many shares?"))
 
-	cost := prices[stock] * amount
+	cost := stockPrice * amount
 
 	newMoney := money - cost
-	portfolio[stock] = portfolio[stock] + amount
+	portfolio[stockName] = portfolio[stockName] + amount
 
 	return portfolio, newMoney
 }
