@@ -22,7 +22,7 @@ var stockData = StockData{
 	"palantir": StockRange{1, 2},
 	"tesla":    StockRange{2, 3},
 }
-var dailyChoices = []string{"buy", "sell", "view details", "call it a day"}
+var dailyChoices = []string{"Buy", "Sell", "View details", "Call it a day"}
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
@@ -48,7 +48,7 @@ func genPortfolio() Portfolio {
 
 func getInput(question string) string {
 	var input string
-	fmt.Println(question)
+	fmt.Print(question)
 	_, err := fmt.Scanln(&input)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -60,12 +60,22 @@ func getInput(question string) string {
 func printOptions(options []string) int {
 	fmt.Println("Options:")
 	for i, option := range options {
-		fmt.Printf("%d: %s\n", i, option)
+		fmt.Printf("%d: %s\n", i+1, option)
 	}
 	choice, _ := strconv.Atoi(getInput("Choice: "))
 	return choice
 }
 
+func selectOption(options []string) int {
+	selection := printOptions(options)
+	// todo: also check to see if the selection is < 1
+	if selection+1 > len(options) {
+		fmt.Printf("Your choice was invalid. Please choose a number between 1 and %d\n", len(options))
+		selection = selectOption(options)
+	}
+	// todo: once this func is working, update other funcs to use it
+	return selection
+}
 
 func genPrices() Portfolio {
 	prices := make(Portfolio)
