@@ -68,13 +68,13 @@ func printOptions(options []string) int {
 
 func selectOption(options []string) int {
 	selection := printOptions(options)
-	// todo: also check to see if the selection is < 1
-	if selection+1 > len(options) {
+	if selection+1 > len(options) && selection < 1 {
 		fmt.Printf("Your choice was invalid. Please choose a number between 1 and %d\n", len(options))
 		selection = selectOption(options)
 	}
+
 	// todo: once this func is working, update other funcs to use it
-	return selection
+	return selection - 1
 }
 
 func genPrices() Portfolio {
