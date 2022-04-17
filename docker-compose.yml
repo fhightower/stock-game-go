@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  _base:
+    &base
+    build:
+      dockerfile: Dockerfile
+      context: .
+    volumes:
+      - ./:/go/src/code/
+
+  dev:
+    <<: *base
+    command: bash
+
