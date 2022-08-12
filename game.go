@@ -147,15 +147,14 @@ func playDay(day int, portfolio Portfolio, money int) (Portfolio, int) {
 	printDetails(day, prices, portfolio, money)
 
 	for looping {
-		choice := printOptions(dailyChoices[:])
-		fmt.Println(choice)
-		if choice == 1 {
+		switch selectOption(dailyChoices[:]) {
+		case 0:
 			portfolio, money = buy(prices, portfolio, money)
-		} else if choice == 2 {
+		case 1:
 			portfolio, money = sell(prices, portfolio, money)
-		} else if choice == 3 {
+		case 2:
 			printDetails(day, prices, portfolio, money)
-		} else if choice == 4 {
+		case 3:
 			looping = false
 		}
 	}
