@@ -38,6 +38,14 @@ func main() {
 	}
 }
 
+func getKeys[K comparable, V any](m map[K]V) []K {
+	var keys []K
+	for k, _ := range m {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
 func genPortfolio() Portfolio {
 	portfolio := make(Portfolio)
 	for stockName, _ := range stockData {
@@ -73,7 +81,6 @@ func selectOption(options []string) int {
 		selection = selectOption(options)
 	}
 
-	// todo: once this func is working, update other funcs to use it
 	return selection - 1
 }
 
@@ -85,26 +92,18 @@ func genPrices() Portfolio {
 	return prices
 }
 
-func getStockNames(data StockData) [2]string {
-	var names [2]string
-	var i int
-	// todo: is it possible to yield in go?
-	for stockName, _ := range data {
-		names[i] = stockName
-		i++
-	}
-	return names
+func getStockNames(data StockData) []string {
+	return getKeys(data)
 }
 
 func buy(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
-	// todo: display the stock names as numbers rather than having to type in the full name
 	stockNames := getStockNames(stockData)
 	// we use stockNames[:] so stockNames are treated as a slice
 	stockNumber := selectOption(stockNames[:])
 	stockName := stockNames[stockNumber]
 	stockPrice := prices[stockName]
 	maxStock := money / stockPrice
-	// todo: handle if maxStock is zero (or negative)
+	// todo: handle if maxStock is zero
 	fmt.Printf("You can buy a max of %d shares", maxStock)
 	amount, _ := strconv.Atoi(getInput("How many shares?"))
 
@@ -118,12 +117,11 @@ func buy(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
 
 func sell(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
 	stockNames := getStockNames(stockData)
-	// we use stockNames[:] so stockNames are treated as a slice
 	stockNumber := selectOption(stockNames[:])
 	stockName := stockNames[stockNumber]
 	stockPrice := prices[stockName]
 	maxStock := portfolio[stockName]
-	// todo: handle if maxStock is zero (or negative)
+	// todo: handle if maxStock is zero
 	fmt.Printf("You can sell a max of %d shares", maxStock)
 	amount, _ := strconv.Atoi(getInput("How many shares?"))
 
