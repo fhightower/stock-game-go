@@ -29,6 +29,7 @@ func main() {
 	fmt.Println("Welcome to the stocks game!")
 	fmt.Printf("The goal is to make as much money in %d days.\n", maxDays)
 	fmt.Printf("You start with $%d\n", startingMoney)
+	getInput("(press enter to continue...)")
 
 	portfolio := genPortfolio()
 	money := startingMoney
@@ -54,23 +55,26 @@ func genPortfolio() Portfolio {
 	return portfolio
 }
 
-func getInput(question string) string {
+func getInput(question string) (string, error) {
 	var input string
 	fmt.Print(question)
 	_, err := fmt.Scanln(&input)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return ""
-	}
-	return input
+	return input, err
 }
 
 func printOptions(options []string) int {
-	fmt.Println("Options:")
+	fmt.Println("\nOptions:")
 	for i, option := range options {
 		fmt.Printf("%d: %s\n", i+1, option)
 	}
-	choice, _ := strconv.Atoi(getInput("Choice: "))
+	input, err := getInput("\nChoice: ")
+
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	choice, _ := strconv.Atoi(input)
 	return choice
 }
 
@@ -105,7 +109,14 @@ func buy(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
 	maxStock := money / stockPrice
 	// todo: handle if maxStock is zero
 	fmt.Printf("You can buy a max of %d shares", maxStock)
-	amount, _ := strconv.Atoi(getInput("How many shares?"))
+	shares, err := getInput("\nHow many shares?")
+
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	amount, _ := strconv.Atoi(shares)
 
 	cost := stockPrice * amount
 
@@ -123,7 +134,14 @@ func sell(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
 	maxStock := portfolio[stockName]
 	// todo: handle if maxStock is zero
 	fmt.Printf("You can sell a max of %d shares", maxStock)
-	amount, _ := strconv.Atoi(getInput("How many shares?"))
+	shares, err := getInput("\nHow many shares?")
+
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	amount, _ := strconv.Atoi(shares)
 
 	cost := stockPrice * amount
 
@@ -134,11 +152,12 @@ func sell(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
 }
 
 func printDetails(day int, prices Portfolio, portfolio Portfolio, money int) {
-	fmt.Println("-----")
-	fmt.Printf("\nDay %d\n", day)
+	fmt.Println("\n-------")
+	fmt.Printf("Day %d\n", day)
 	fmt.Printf("Money: %d\n", money)
 	fmt.Printf("Portfolio: %v\n", portfolio)
 	fmt.Printf("Prices: %v\n", prices)
+	fmt.Println("-------")
 }
 
 func playDay(day int, portfolio Portfolio, money int) (Portfolio, int) {
