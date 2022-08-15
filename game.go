@@ -16,7 +16,7 @@ type StockRange struct {
 type StockData = map[string]StockRange
 
 const startingMoney int = 111
-const maxDays int = 1
+const maxDays int = 2
 
 var stockData = StockData{
 	"palantir": StockRange{1, 2},
@@ -26,7 +26,7 @@ var dailyChoices = []string{"Buy", "Sell", "View details", "Call it a day"}
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	fmt.Println("Welcome to the stocks game!")
+	fmt.Println("\nWelcome to the stocks game!")
 	fmt.Printf("The goal is to make as much money in %d days.\n", maxDays)
 	fmt.Printf("You start with $%d\n", startingMoney)
 	getInput("(press enter to continue...)")
@@ -37,6 +37,7 @@ func main() {
 	for day := 1; day < (maxDays + 1); day++ {
 		portfolio, money = playDay(day, portfolio, money)
 	}
+	fmt.Println("Thanks for playing!")
 }
 
 func getKeys[K comparable, V any](m map[K]V) []K {
@@ -151,12 +152,21 @@ func sell(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
 	return portfolio, newMoney
 }
 
+func printMap(m map[string]int) {
+	// todo: sort by key before printing
+	for k, v := range m {
+		fmt.Printf("  %s: %d\n", k, v)
+	}
+}
+
 func printDetails(day int, prices Portfolio, portfolio Portfolio, money int) {
 	fmt.Println("\n-------")
 	fmt.Printf("Day %d\n", day)
 	fmt.Printf("Money: %d\n", money)
-	fmt.Printf("Portfolio: %v\n", portfolio)
-	fmt.Printf("Prices: %v\n", prices)
+	fmt.Println("Portfolio:")
+	printMap(portfolio)
+	fmt.Println("Prices:")
+	printMap(prices)
 	fmt.Println("-------")
 }
 
