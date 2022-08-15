@@ -16,11 +16,12 @@ type StockRange struct {
 type StockData = map[string]StockRange
 
 const startingMoney int = 111
-const maxDays int = 2
+const maxDays int = 7
 
 var stockData = StockData{
-	"palantir": StockRange{1, 2},
-	"tesla":    StockRange{2, 3},
+	"palantir": StockRange{7, 20},
+	"ford": StockRange{8, 14},
+	"microsoft": StockRange{180, 280},
 }
 var dailyChoices = []string{"Buy", "Sell", "View details", "Call it a day"}
 
