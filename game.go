@@ -65,6 +65,7 @@ func getInput(question string) (string, error) {
 }
 
 func printOptions(options []string) int {
+	// todo: sort options alphabetically before printing
 	fmt.Println("\nOptions:")
 	for i, option := range options {
 		fmt.Printf("%d: %s\n", i+1, option)
@@ -103,6 +104,7 @@ func getStockNames(data StockData) []string {
 }
 
 func buy(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
+	// todo: show only buyable stocks
 	stockNames := getStockNames(stockData)
 	// we use stockNames[:] so stockNames are treated as a slice
 	stockNumber := selectOption(stockNames[:])
@@ -128,10 +130,21 @@ func buy(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
 	return portfolio, newMoney
 }
 
+func getSellableStockNames(stockNames []string, portfolio Portfolio) []string {
+	var sellableStockNames []string
+	for _, name := range stockNames {
+		if portfolio[name] > 0 {
+			sellableStockNames = append(sellableStockNames, name)
+		}
+	}
+	return sellableStockNames
+}
+
 func sell(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
 	stockNames := getStockNames(stockData)
-	stockNumber := selectOption(stockNames[:])
-	stockName := stockNames[stockNumber]
+	sellableStockNames := getSellableStockNames(stockNames, portfolio)
+	stockNumber := selectOption(sellableStockNames[:])
+	stockName := sellableStockNames[stockNumber]
 	stockPrice := prices[stockName]
 	maxStock := portfolio[stockName]
 	// todo: handle if maxStock is zero
