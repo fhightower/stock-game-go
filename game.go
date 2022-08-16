@@ -103,17 +103,26 @@ func getStockNames(data StockData) []string {
 	return getKeys(data)
 }
 
+func getBuyableStockNames(stockNames []string, prices Portfolio, money int) []string {
+	var buyableStockNames []string
+	for _, name := range stockNames {
+		if prices[name] <= money {
+			buyableStockNames = append(buyableStockNames, name)
+		}
+	}
+	return buyableStockNames
+}
+
 func buy(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
-	// todo: show only buyable stocks
 	stockNames := getStockNames(stockData)
-	// we use stockNames[:] so stockNames are treated as a slice
-	stockNumber := selectOption(stockNames[:])
-	stockName := stockNames[stockNumber]
+	buyableStockNames := getBuyableStockNames(stockNames, prices, money)
+	stockNumber := selectOption(buyableStockNames[:])
+	stockName := buyableStockNames[stockNumber]
 	stockPrice := prices[stockName]
 	maxStock := money / stockPrice
 	// todo: handle if maxStock is zero
 	fmt.Printf("You can buy a max of %d shares", maxStock)
-	shares, err := getInput("\nHow many shares?")
+	shares, err := getInput("\nHow many shares? ")
 
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -149,7 +158,7 @@ func sell(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
 	maxStock := portfolio[stockName]
 	// todo: handle if maxStock is zero
 	fmt.Printf("You can sell a max of %d shares", maxStock)
-	shares, err := getInput("\nHow many shares?")
+	shares, err := getInput("\nHow many shares? ")
 
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
