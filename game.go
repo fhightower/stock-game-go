@@ -37,8 +37,12 @@ func main() {
 
 	for day := 1; day < (maxDays + 1); day++ {
 		portfolio, money = playDay(day, portfolio, money)
+		if day == maxDays - 1 {
+			fmt.Println("\nThis is the last day... sell everything you have!")
+		}
 	}
-	fmt.Println("Thanks for playing!")
+	fmt.Println("\nThanks for playing!")
+	fmt.Printf("You ended with $%d ($%d total profit)\n", money, money - startingMoney)
 }
 
 func getKeys[K comparable, V any](m map[K]V) []K {
