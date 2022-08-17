@@ -193,9 +193,10 @@ func sell(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
 }
 
 func printMap(m map[string]int) {
-	// todo: sort by key before printing
-	for k, v := range m {
-		fmt.Printf("  %s: %d\n", k, v)
+	mapKeys := getKeys(m)
+	sort.Strings(mapKeys)
+	for _, k := range mapKeys {
+		fmt.Printf("  %s: %d\n", k, m[k])
 	}
 }
 
