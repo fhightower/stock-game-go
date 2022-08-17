@@ -128,7 +128,6 @@ func buy(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
 	stockName := buyableStockNames[stockNumber]
 	stockPrice := prices[stockName]
 	maxStock := money / stockPrice
-	// todo: handle if maxStock is zero
 	fmt.Printf("You can buy a max of %d shares", maxStock)
 	shares, err := getInput("\nHow many shares? ")
 
@@ -137,7 +136,12 @@ func buy(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
 		os.Exit(1)
 	}
 
-	amount, _ := strconv.Atoi(shares)
+	amount := 0
+	if shares == "m" {
+		amount = maxStock
+	} else {
+		amount, _ = strconv.Atoi(shares)
+	}
 
 	cost := stockPrice * amount
 
@@ -164,7 +168,6 @@ func sell(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
 	stockName := sellableStockNames[stockNumber]
 	stockPrice := prices[stockName]
 	maxStock := portfolio[stockName]
-	// todo: handle if maxStock is zero
 	fmt.Printf("You can sell a max of %d shares", maxStock)
 	shares, err := getInput("\nHow many shares? ")
 
@@ -173,7 +176,12 @@ func sell(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
 		os.Exit(1)
 	}
 
-	amount, _ := strconv.Atoi(shares)
+	amount := 0
+	if shares == "m" {
+		amount = maxStock
+	} else {
+		amount, _ = strconv.Atoi(shares)
+	}
 
 	cost := stockPrice * amount
 
