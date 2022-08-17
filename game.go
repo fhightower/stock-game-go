@@ -31,7 +31,8 @@ func main() {
 	fmt.Println("\nWelcome to the stocks game!")
 	fmt.Printf("The goal is to make as much money in %d days.\n", maxDays)
 	fmt.Printf("You start with $%d\n", startingMoney)
-	getInput("(press enter to continue...)")
+	fmt.Println("\n(HINT) If you ever want to buy/sell the max amount of a stock, enter 'm' as the amount of the stock you want to buy/sell")
+	getInput("\n(press enter to continue...)")
 
 	portfolio := genPortfolio()
 	money := startingMoney
