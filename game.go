@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sort"
 	"math/rand"
 	"os"
 	"strconv"
@@ -68,8 +69,11 @@ func getInput(question string) (string, error) {
 	return input, err
 }
 
-func printOptions(options []string) int {
-	// todo: sort options alphabetically before printing
+func printOptions(options []string, sorted bool) int {
+	if sorted {
+		sort.Strings(options)
+	}
+
 	fmt.Println("\nOptions:")
 	for i, option := range options {
 		fmt.Printf("%d: %s\n", i+1, option)
@@ -85,11 +89,11 @@ func printOptions(options []string) int {
 	return choice
 }
 
-func selectOption(options []string) int {
-	selection := printOptions(options)
+func selectOption(options []string, sorted bool) int {
+	selection := printOptions(options, sorted)
 	if selection > len(options)-1 && selection < 1 {
 		fmt.Printf("Your choice was invalid. Please choose a number between 1 and %d\n", len(options))
-		selection = selectOption(options)
+		selection = selectOption(options, sorted)
 	}
 
 	return selection - 1
@@ -120,7 +124,7 @@ func getBuyableStockNames(stockNames []string, prices Portfolio, money int) []st
 func buy(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
 	stockNames := getStockNames(stockData)
 	buyableStockNames := getBuyableStockNames(stockNames, prices, money)
-	stockNumber := selectOption(buyableStockNames[:])
+	stockNumber := selectOption(buyableStockNames[:], true)
 	stockName := buyableStockNames[stockNumber]
 	stockPrice := prices[stockName]
 	maxStock := money / stockPrice
@@ -156,7 +160,7 @@ func getSellableStockNames(stockNames []string, portfolio Portfolio) []string {
 func sell(prices Portfolio, portfolio Portfolio, money int) (Portfolio, int) {
 	stockNames := getStockNames(stockData)
 	sellableStockNames := getSellableStockNames(stockNames, portfolio)
-	stockNumber := selectOption(sellableStockNames[:])
+	stockNumber := selectOption(sellableStockNames[:], true)
 	stockName := sellableStockNames[stockNumber]
 	stockPrice := prices[stockName]
 	maxStock := portfolio[stockName]
@@ -203,7 +207,7 @@ func playDay(day int, portfolio Portfolio, money int) (Portfolio, int) {
 	printDetails(day, prices, portfolio, money)
 
 	for looping {
-		switch selectOption(dailyChoices[:]) {
+		switch selectOption(dailyChoices[:], false) {
 		case 0:
 			portfolio, money = buy(prices, portfolio, money)
 		case 1:
