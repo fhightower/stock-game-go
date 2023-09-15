@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
-	"sort"
 	"math/rand"
 	"os"
+	"sort"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -15,13 +17,19 @@ type StockRange struct {
 	max int
 }
 type StockData = map[string]StockRange
+type HighScoreEntry struct {
+	score int
+	date  string
+}
 
 const startingMoney int = 111
 const maxDays int = 7
+const leaderboardFile = "leaderboard.txt"
+const maxHighScores = 5
 
 var stockData = StockData{
-	"palantir": StockRange{7, 20},
-	"ford": StockRange{8, 14},
+	"palantir":  StockRange{7, 20},
+	"ford":      StockRange{8, 14},
 	"microsoft": StockRange{180, 280},
 }
 var dailyChoices = []string{"Buy", "Sell", "View details", "Call it a day"}
@@ -39,12 +47,91 @@ func main() {
 
 	for day := 1; day < (maxDays + 1); day++ {
 		portfolio, money = playDay(day, portfolio, money)
-		if day == maxDays - 1 {
+		if day == maxDays-1 {
 			fmt.Println("\nThis is the last day... sell everything you have!")
 		}
 	}
 	fmt.Println("\nThanks for playing!")
-	fmt.Printf("You ended with $%d ($%d total profit)\n", money, money - startingMoney)
+	fmt.Printf("You ended with $%d ($%d total profit)\n", money, money-startingMoney)
+	recordScore(money)
+}
+
+func recordScore(money int) {
+	highScores := readHighScores()
+	newHighScores := updateHighScores(highScores, money)
+	writeHighScores(newHighScores)
+}
+
+func readHighScores() []HighScoreEntry {
+	file, err := os.Open(leaderboardFile)
+	var lines []HighScoreEntry
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return lines
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		line := strings.Split(scanner.Text(), " ")
+		intScore, _ := strconv.Atoi(line[0])
+		v := HighScoreEntry{intScore, line[1]}
+		lines = append(lines, v)
+	}
+	return lines
+}
+
+func insertSlice[T any](slice []T, element T, index int) []T {
+	// First, check if the index is out of bounds.
+	if index < 0 || index > len(slice) {
+		fmt.Println("Index out of bounds.")
+		return slice
+	}
+
+	// Create a new slice with an extra element.
+	newSlice := make([]T, len(slice))
+
+	// Copy the elements before the index.
+	copy(newSlice[:index], slice[:index])
+
+	// Insert the element at the specified index.
+	newSlice[index] = element
+
+	// Copy the elements after the index.
+	copy(newSlice[index+1:], slice[index:maxHighScores-1])
+
+	return newSlice
+}
+
+func updateHighScores(highScores []HighScoreEntry, score int) []HighScoreEntry {
+	for i, v := range highScores {
+		highScore := v.score
+		if score > highScore {
+			currentTime := time.Now()
+			newHighScore := HighScoreEntry{score, fmt.Sprintf("(%s)", currentTime.Format("2006-01-02"))}
+			return insertSlice(highScores, newHighScore, i)
+		}
+	}
+	return highScores
+}
+
+func writeHighScores(highScores []HighScoreEntry) {
+	file, err := os.Create("leaderboard.txt")
+	if err != nil {
+		fmt.Println("Error creating/opening file:", err)
+		return
+	}
+	defer file.Close() // Close the file when we're done
+
+	for _, score := range highScores {
+		line := fmt.Sprintf("%d %s\n", score.score, score.date)
+		_, err := file.WriteString(line)
+		if err != nil {
+			fmt.Println("Error writing to file:", err)
+			return
+		}
+	}
 }
 
 func getKeys[K comparable, V any](m map[K]V) []K {
